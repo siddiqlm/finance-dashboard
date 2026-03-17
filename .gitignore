@@ -1,0 +1,29 @@
+# Dependencies
+server/node_modules/
+client/node_modules/
+
+# Environment variables - NEVER commit this!
+server/.env
+client/.env
+.env
+
+# Compiled output
+server/dist/
+client/.next/
+
+# Logs
+server/logs/
+*.log
+
+# Docker volumes
+postgres_data/
+
+# Prisma
+server/prisma/migrations/dev/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
