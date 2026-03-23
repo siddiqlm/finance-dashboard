@@ -1,6 +1,7 @@
-import { Prisma, SavingsGoal } from "@prisma/client";
+import { SavingsGoal } from "@prisma/client";
 import prisma from "../prisma/client";
 import { AppError } from "../utils/AppError";
+import { cleanObject } from "../utils/cleanObject";
 
 export const getAllSavingGoals = async (userId:number) => {
     return await prisma.savingsGoal.findMany({
@@ -22,20 +23,15 @@ export const createSavingGoal = async(
         targetAmount: number;
         currentAmount: number;
         deadline?: string;
-        userId: number,
         isCompleted: boolean,
     }
 ):Promise<SavingsGoal> => {
-    const createData:any = {...data};
-    if(data.deadline !== undefined){
-        createData.deadline = data.deadline ? new Date(data.deadline): null;
-    }
-    else{
-        delete createData.deadline
-    }
     return await prisma.savingsGoal.create({
         data: {
-            ...createData,
+            title: data.title,
+            targetAmount: data.targetAmount,
+            currentAmount: data.currentAmount ?? 0,
+            deadline: data.deadline ? new Date(data.deadline): null,
             userId
         }
     })
@@ -56,14 +52,14 @@ export const updateSavingGoal = async(
         deadline?: string;
     }
 ):Promise<SavingsGoal> => {
-    const updateData:any = {...data};
-    if(data.deadline !== undefined){
-        updateData.deadline = data.deadline? new Date(data.deadline): null;
-    }
-    else{
-        delete updateData.deadline
-    }
-     return await prisma.savingsGoal.update({
+    const {deadline, ...rest} = data;
+    const updateData = cleanObject({
+        ...rest,
+        ...(deadline !==undefined && {
+            deadline: deadline? new Date(deadline): null
+        })
+    }) 
+    return await prisma.savingsGoal.update({
         where: {id, userId},
         data: updateData
     })
