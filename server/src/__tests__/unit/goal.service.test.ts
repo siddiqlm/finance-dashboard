@@ -1,5 +1,6 @@
 import { getAllSavingGoals, getSavingGoalById, createSavingGoal, updateSavingGoal, deleteSavingGoal, contributeToGoal } from "../../services/goal.service";
 import prisma from "../../prisma/client";
+import { SavingsGoal } from "@prisma/client";
 
 jest.mock("../../prisma/client", () => ({
     savingsGoal: {
@@ -8,7 +9,8 @@ jest.mock("../../prisma/client", () => ({
         create: jest.fn(),
         update: jest.fn(),
         delete: jest.fn()
-    }
+    },
+    $disconnect: jest.fn()
 }))
 
 describe("Savings Goal Service", () => {
@@ -32,6 +34,42 @@ describe("Savings Goal Service", () => {
                 orderBy: {createAt: "desc"}
             })
         })
+         it("Should return empty result when no saving goals exist", async () => {
+            (prisma.savingsGoal.findMany as jest.Mock).mockResolvedValue([]);
+            const result = await getAllSavingGoals(1);
+            expect(result).toEqual([]);
+         })
     })
+
+    describe("CreateSavingsGoals", () =>{
+        it("Should return created goals", async() => {
+            const input = {
+                "title": "Test",
+                "targetAmount": 10000,
+                "deadline": "2026-12-31",
+                "currentAmount": 0
+            };
+            const mockCreated: SavingsGoal = {
+                id: 1,
+                title: input.title,
+                targetAmount: input.targetAmount,
+                currentAmount: 0,
+                isCompleted: false,
+                deadline: new Date(input.deadline),
+                userId: 1,
+                createAt: new Date()
+            };
+
+            (prisma.savingsGoal.create as jest.Mock).mockResolvedValue(mockCreated)
+
+            const result = await createSavingGoal(1, input)
+            expect(result).toEqual(mockCreated);
+            expect(prisma.savingsGoal.create).toHaveBeenCalledTimes(1);
+        })
+    })
+})
+
+afterAll(async() => {
+    await prisma.$disconnect();
 })
 

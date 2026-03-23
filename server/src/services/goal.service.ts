@@ -2,6 +2,7 @@ import { SavingsGoal } from "@prisma/client";
 import prisma from "../prisma/client";
 import { AppError } from "../utils/AppError";
 import { cleanObject } from "../utils/cleanObject";
+import { CreateGoalInput } from "../validators/goal.validator";
 
 export const getAllSavingGoals = async (userId:number) => {
     return await prisma.savingsGoal.findMany({
@@ -18,13 +19,7 @@ export const getSavingGoalById = async(id: number, userId: number) => {
 
 export const createSavingGoal = async(
     userId: number, 
-    data: {
-        title: string;
-        targetAmount: number;
-        currentAmount: number;
-        deadline?: string;
-        isCompleted: boolean,
-    }
+    data: CreateGoalInput
 ):Promise<SavingsGoal> => {
     return await prisma.savingsGoal.create({
         data: {
