@@ -3,7 +3,7 @@ import {z} from "zod";
 export const createSavingGoalSchema = z.object({
     title: z.string().trim().min(1, "Title is required"),
     targetAmount: z.number().positive("Target Amount must be a positive number"),
-    currentAmount: z.number().positive("Current amount must be a postive number"),
+    currentAmount: z.number().positive("Current amount must be a postive number").optional(),
     deadline:z.string().nullable().optional()
 }).refine(
     data => !data.currentAmount || data.currentAmount <= data.targetAmount,
