@@ -1,8 +1,13 @@
 import {Request, Response, NextFunction} from "express";
 import * as TransactionService from "../services/transaction.service";
 import { AppError } from "../utils/AppError";
+import logger from "../utils/logger";
 
-export const getAllTransactions = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllTransactions = async (
+    req: Request, 
+    res: Response, 
+    next: NextFunction
+):Promise<void> => {
     try{
         const transactions = await TransactionService.getAllTransactions(1);
         res.json(transactions)
@@ -11,7 +16,11 @@ export const getAllTransactions = async (req: Request, res: Response, next: Next
     }  
 };
 
-export const getTransactionById = async (req: Request, res: Response, next: NextFunction) => {
+export const getTransactionById = async (
+    req: Request, 
+    res: Response, 
+    next: NextFunction
+):Promise<void> => {
     try {
         const id = parseInt(req.params.id as string);
         if(isNaN(id)){
@@ -27,7 +36,11 @@ export const getTransactionById = async (req: Request, res: Response, next: Next
     }
 };
 
-export const createTransaction = async (req: Request, res: Response, next:NextFunction) => {
+export const createTransaction = async (
+    req: Request, 
+    res: Response, 
+    next:NextFunction
+):Promise<void> => {
     try {
         const body = req.body;
         const transaction = await TransactionService.createTransaction(1, req.body);
@@ -37,7 +50,11 @@ export const createTransaction = async (req: Request, res: Response, next:NextFu
     }
 };
 
-export const updateTransaction = async (req: Request, res: Response, next: NextFunction) => {
+export const updateTransaction = async (
+    req: Request, 
+    res: Response, 
+    next: NextFunction
+):Promise<void> => {
     try {
         const id = parseInt(req.params.id as string);
         if(isNaN(id)){
@@ -51,7 +68,11 @@ export const updateTransaction = async (req: Request, res: Response, next: NextF
     }
 };
 
-export const deleteTransaction = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteTransaction = async (
+    req: Request, 
+    res: Response, 
+    next: NextFunction
+):Promise<void> => {
     try {
         const id = parseInt(req.params.id as string);
         if(isNaN(id)){
@@ -61,5 +82,20 @@ export const deleteTransaction = async (req: Request, res: Response, next: NextF
         res.status(204).send();
     } catch (error) {
         next(error);
+    }
+}
+
+export const getMonthlySummary = async(
+    req: Request,
+    res: Response,
+    next: NextFunction
+):Promise<void> => {
+    try {
+        const {month} = req.params;
+        if(month === undefined) throw new AppError("Invalid month", 404);
+        const summary = await TransactionService.getMonthlySummary(1, month as string);
+        res.json(summary);
+    } catch (error) {
+        next(error)
     }
 }

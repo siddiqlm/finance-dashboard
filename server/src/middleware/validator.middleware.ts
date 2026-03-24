@@ -19,3 +19,21 @@ export const validate =  (schema: ZodType) => {
         next();
     }
 }
+
+
+export const validateParams = (schema: ZodType) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const result = schema.safeParse(req.params);
+        if (!result.success) {
+            res.status(400).json({
+                message: "Invalid parameters",
+                errors: result.error.issues.map(err => ({
+                    field: err.path.join("."),
+                    message: err.message
+                }))
+            });
+            return;
+        }
+        next();
+    };
+};
